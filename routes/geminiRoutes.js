@@ -4,6 +4,7 @@ const router = express.Router();
 
 // Import Gemini service
 const { generateContent } = require('../services/gemini');
+const { generateRoadmap } = require('../services/geminiroadmap');
 
 // Protect all routes
 router.use(protect);
@@ -24,6 +25,24 @@ router.post('/generate-ideas', async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: { ideas: response }
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err.message
+    });
+  }
+});
+
+// Generate project roadmap using Gemini
+router.post('/generate-roadmap', async (req, res) => {
+  try {
+    const { idea } = req.body;
+    const roadmap = await generateRoadmap(idea, req.user.id);
+
+    res.status(200).json({
+      status: 'success',
+      data: { roadmap }
     });
   } catch (err) {
     res.status(400).json({
