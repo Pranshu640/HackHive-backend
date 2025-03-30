@@ -21,6 +21,28 @@ const projectSchema = new mongoose.Schema({
   workflow: [String],
   techStack: [String],
   features: [String],
+  roadmap: {
+    phases: [{
+      name: String,
+      duration: String,
+      tasks: [{
+        title: String,
+        description: String,
+        estimatedHours: Number,
+        subtasks: [String],
+        assignedTo: {
+          type: mongoose.Schema.ObjectId,
+          ref: 'User'
+        }
+      }]
+    }],
+    totalDuration: String,
+    keyMilestones: [String],
+    risksAndMitigations: [{
+      risk: String,
+      mitigation: String
+    }]
+  },
   team: {
     type: mongoose.Schema.ObjectId,
     ref: 'Team'
@@ -50,4 +72,4 @@ projectSchema.pre(/^find/, function(next) {
 
 const Project = mongoose.model('Project', projectSchema);
 
-module.exports = Project; 
+module.exports = Project;

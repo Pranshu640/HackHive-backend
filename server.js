@@ -21,6 +21,7 @@ const userRoutes = require('./routes/userRoutes');
 const teamRequestRoutes = require('./routes/teamRequestRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const geminiRoutes = require('./routes/geminiRoutes');
+const projectRoutes = require('./routes/projectRoutes');
 
 // Mount routes
 app.use('/api/v1/auth', authRoutes);
@@ -28,6 +29,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/team-requests', teamRequestRoutes);
 app.use('/api/v1/teams', teamRoutes);
 app.use('/api/v1/gemini', geminiRoutes);
+app.use('/api/v1/projects', projectRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

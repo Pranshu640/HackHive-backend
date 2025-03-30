@@ -3,6 +3,38 @@ const Team = require('../models/Team');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 
+// Get all projects
+exports.getAllProjects = async (req, res) => {
+  try {
+    const projects = await Project.find()
+      .populate({
+        path: 'team',
+        select: 'name members',
+        populate: {
+          path: 'members',
+          select: 'name email skills'
+        }
+      })
+      .populate({
+        path: 'createdBy',
+        select: 'name email'
+      });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        projects
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching all projects:', err);
+    res.status(500).json({
+      status: 'fail',
+      message: 'Error fetching projects'
+    });
+  }
+};
+
 // Create a new project/idea
 exports.createProject = async (req, res) => {
   try {
@@ -41,10 +73,10 @@ exports.createProject = async (req, res) => {
     
     console.log('Project created:', project._id);
     
-    // If associated with a team, update the team's chosenProject
+    // If associated with a team, add project to team's projects array
     if (req.body.team) {
       const updatedTeam = await Team.findByIdAndUpdate(req.body.team, {
-        chosenProject: project._id
+        $push: { projects: project._id }
       }, { new: true });
       
       console.log('Team updated with project reference:', updatedTeam._id);
@@ -129,20 +161,36 @@ exports.getTeamProject = async (req, res) => {
     
     console.log('User team found:', user.team._id);
     
-    const team = await Team.findById(user.team._id);
+    const team = await Team.findById(user.team._id).populate({
+      path: 'projects',
+      populate: [
+        {
+          path: 'team',
+          select: 'name members',
+          populate: {
+            path: 'members',
+            select: 'name email skills'
+          }
+        },
+        {
+          path: 'createdBy',
+          select: 'name email'
+        }
+      ]
+    });
     
-    if (!team.chosenProject) {
-      console.log('Team has no chosen project');
+    if (!team.projects || team.projects.length === 0) {
+      console.log('Team has no projects');
       return res.status(404).json({
         status: 'fail',
-        message: 'This team has not chosen a project yet'
+        message: 'This team has no projects yet'
       });
     }
     
-    console.log('Team chosen project ID:', team.chosenProject);
+    console.log('Team projects found:', team.projects.length);
     
-    // Fetch the project directly
-    const project = await Project.findById(team.chosenProject)
+    // Return all team projects
+    const projects = team.projects
       .populate({
         path: 'team',
         select: 'name members',
@@ -156,19 +204,9 @@ exports.getTeamProject = async (req, res) => {
         select: 'name email'
       });
     
-    if (!project) {
-      console.log('Project not found in the database');
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Project not found in the database'
-      });
-    }
-    
-    console.log('Project found:', project._id);
-    
     res.status(200).json({
       status: 'success',
-      data: { project }
+      data: { projects }
     });
   } catch (err) {
     console.error('Error getting team project:', err);
@@ -177,4 +215,4 @@ exports.getTeamProject = async (req, res) => {
       message: err.message
     });
   }
-}; 
+};

@@ -4,7 +4,7 @@ const ai = new GoogleGenerativeAI('AIzaSyDD8ka6-lGSX3JhBGFDSf3teB3_2AuRC80');
 
 exports.generateContent = async (prompt) => { 
   try {
-    const model = ai.getGenerativeModel({ model: 'gemini-pro' });
+    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const result = await model.generateContent(prompt  +`give parameters as such teams skill match and challenging of the project (challenging and skill match are to be percentage parameters)`+ ` Generate a structured JSON array of project ideas...`);
     const response = await result.response;
     

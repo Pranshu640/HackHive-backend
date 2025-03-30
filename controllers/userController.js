@@ -25,6 +25,24 @@ exports.getProfile = async (req, res) => {
   }
 };
 
+// Get all users (public endpoint)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('name skills').lean();
+    res.status(200).json({
+      status: 'success',
+      data: {
+        users
+      }
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: err.message
+    });
+  }
+};
+
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {

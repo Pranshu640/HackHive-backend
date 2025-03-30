@@ -3,17 +3,19 @@ const { protect } = require('../controllers/authController');
 const {
   createProject,
   getProject,
-  getTeamProject
+  getTeamProject,
+  getAllProjects
 } = require('../controllers/projectController');
 
 const router = express.Router();
 
-// Protect all routes after this middleware
-router.use(protect);
-
-// Project routes
-router.post('/', createProject);
-router.get('/team', getTeamProject);
+// Public routes
+router.get('/all', getAllProjects);
 router.get('/:id', getProject);
 
-module.exports = router; 
+// Protected routes
+router.use(protect);
+router.post('/', createProject);
+router.get('/team', getTeamProject);
+
+module.exports = router;

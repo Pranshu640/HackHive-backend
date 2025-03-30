@@ -27,6 +27,10 @@ const teamSchema = new mongoose.Schema({
     type: Number,
     default: 4
   },
+  projects: [{
+    type: mongoose.Schema.ObjectId,
+    ref: 'Project'
+  }],
   createdAt: {
     type: Date,
     default: Date.now
